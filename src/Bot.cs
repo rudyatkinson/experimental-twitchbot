@@ -21,8 +21,8 @@ namespace TwitchBot.Granzwelt
         #region attributes
 
         public const string author = "rudyatkinson";
-        public const string userName = "RudyAsBot";
-        public const string accessToken = "oauth:9z7e9dsjo71xh34gt5yebngo1kjs41";
+        public const string userName = "botName";
+        public const string accessToken = "accessToken";
         public string channelName { get; private set; }
 
         #endregion
