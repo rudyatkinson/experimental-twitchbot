@@ -16,8 +16,6 @@ namespace Granzwelt.TwitchBot
     {
         #region attributes
 
-        //oauth:9z7e9dsjo71xh34gt5yebngo1kjs41
-
         public const string author = "rudyatkinson";
         public string botName { get; private set; }
         public string accessToken { get; private set; }
