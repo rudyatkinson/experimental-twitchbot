@@ -1,7 +1,7 @@
 using System;
 using System.Timers;
 
-namespace TwitchBot.Granzwelt
+namespace Granzwelt.TwitchBot
 {
     public class TimedCommand
     {
@@ -36,6 +36,13 @@ namespace TwitchBot.Granzwelt
         {
             feedback = newFeedback;
             bot.Chat($"{commandName} isimli zamanlı komut dönüşü değiştirildi");
+        }
+
+        public void DisableTimedCommand() 
+        {
+            timer.Elapsed -= SendTwitchAsMessage;
+            timer.Enabled = false;
+            timer.Dispose();
         }
     }
 }

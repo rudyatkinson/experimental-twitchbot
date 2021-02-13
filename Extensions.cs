@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TwitchBot.Granzwelt
+namespace Granzwelt.TwitchBot
 {
     public static class Extensions
     {

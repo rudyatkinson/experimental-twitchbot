@@ -2,7 +2,7 @@ using System;
 using Telegram.Bot;
 using System.Collections.Generic;
 
-namespace TwitchBot.Granzwelt
+namespace Granzwelt.TwitchBot
 {
     public class TelegramBot
     {

@@ -9,11 +9,14 @@ using TwitchLib.Communication.Models;
 using System.Linq;
 
 
-namespace TwitchBot.Granzwelt
+
+namespace Granzwelt.TwitchBot
 {
     public class Bot
     {
         #region attributes
+
+        //oauth:9z7e9dsjo71xh34gt5yebngo1kjs41
 
         public const string author = "rudyatkinson";
         public string botName { get; private set; }
@@ -54,9 +57,9 @@ namespace TwitchBot.Granzwelt
             "!listesil",
             "!sayacolustur",
             "!sayacsil",
-            "!zamanlayici",
-            "!zamanlayicisil",
-            "!zamanlayicilar"
+            "!dongumesaj",
+            "!dongumesajsil",
+            "!dongumesajlar"
         };
 
         #endregion
@@ -97,6 +100,12 @@ namespace TwitchBot.Granzwelt
             client.Connect();
 
             Client_LoadContents();
+
+        }
+
+        public void Deneme()
+        {
+            Chat("thread denemesi");
         }
 
         private void Client_LoadContents()
@@ -120,7 +129,7 @@ namespace TwitchBot.Granzwelt
 
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
-            client.SendMessage(e.AutoJoinChannel, $"{botName} kanala bağlandı! Yeni işlevseller: listeler, döngü mesajlar ve sayaçlar. !komutlar");
+            client.SendMessage(e.AutoJoinChannel, $"{botName} kanala bağlandı! [ref --> github.com/TwitchLib, version --> 0.2, author --> @RudyAtkinson] !komutlar");
         }
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -176,13 +185,13 @@ namespace TwitchBot.Granzwelt
                     case "!sayaclar":
                         CommandSayaclar(e);
                         break;
-                    case "!zamanlayici":
+                    case "!dongumesaj":
                         CommandZamanlayici(e, parts);
                         break;
-                    case "!zamanlayicisil":
+                    case "!dongumesajsil":
                         CommandZamanlayiciSil(e, parts);
                         break;
-                    case "!zamanlayicilar":
+                    case "!dongumesajlar":
                         CommandZamanlayicilar(e);
                         break;
                     default:
@@ -206,7 +215,7 @@ namespace TwitchBot.Granzwelt
             {
                 case 1:
 
-                    Chat($"Geçerli komut: !zamanlikomut <komut_adi> <döngü_süresi_dakika> <döngü mesajı>");
+                    Chat($"Geçerli komut: !dongumesaj <mesaj_adi> <döngü_süresi_dakika> <döngü mesajı>");
                     break;
 
                 case 2:
@@ -214,9 +223,9 @@ namespace TwitchBot.Granzwelt
                     if (timedCommandDictionary.ContainsKey(parts[1]))
                     {
                         TimedCommand tempCommand = timedCommandDictionary[parts[1]];
-                        Chat($"{tempCommand.commandName} adlı komut döngü süresi: {tempCommand.duration} dakika, dönen mesaj: {tempCommand.feedback}");
+                        Chat($"{tempCommand.commandName} adlı mesaj döngü süresi: {tempCommand.duration} dakika, dönen mesaj: {tempCommand.feedback}");
                     }
-                    else Chat($"{parts[1]} adlı bir zamanlı komut bulunmuyor.");
+                    else Chat($"{parts[1]} adlı döngü mesaj oluşturulmamış.");
 
                     break;
 
@@ -224,11 +233,13 @@ namespace TwitchBot.Granzwelt
 
                     if (!timedCommandDictionary.ContainsKey(parts[1]))
                     {
-                        Chat($"{parts[1]} adlı bir zamanlı komut bulunmuyor.");
+                        Chat($"{parts[1]} adlı döngü mesaj oluşturulmamış.");
                         break;
                     }
 
-                    if (int.TryParse(parts[2], out duration)) timedCommandDictionary[parts[1]].ChangeDuration(duration);
+                    if (int.TryParse(parts[2], out duration) && 
+                    timedCommandDictionary.ContainsKey(parts[1])) timedCommandDictionary[parts[1]].ChangeDuration(duration);
+                    else if (timedCommandDictionary.ContainsKey(parts[1])) timedCommandDictionary[parts[1]].ChangeFeedback(parts[2]);
                     timedCommandDictionary.SaveTimedMessages(channelName, "TimedCommands");
                     break;
 
@@ -236,6 +247,12 @@ namespace TwitchBot.Granzwelt
 
                     if (!int.TryParse(parts[2], out duration))
                     {
+                        if (!timedCommandDictionary.ContainsKey(parts[1]))
+                        {
+                            Chat($"{parts[1]} adlı döngü mesaj oluşturulmamış.");
+                            break;
+                        }
+
                         string newFeedback = String.Empty;
                         for (int i = 2; i < parts.Length; i++)
                         {
@@ -245,6 +262,12 @@ namespace TwitchBot.Granzwelt
 
                         timedCommandDictionary[parts[1]].ChangeFeedback(newFeedback);
                         timedCommandDictionary.SaveTimedMessages(channelName, "TimedCommands");
+                        break;
+                    }
+
+                    if (timedCommandDictionary.ContainsKey(parts[1]))
+                    {
+                        Chat($"{parts[1]} adlı döngü mesaj zaten var.");
                         break;
                     }
 
@@ -267,12 +290,13 @@ namespace TwitchBot.Granzwelt
 
             if (parts.Length <= 1)
             {
-                Chat("Geçerli Komut: !zamanlikomutsil <komut_adi>");
+                Chat("Geçerli Komut: !dongumesajsil <döngü_adi>");
                 return;
             }
 
             if (timedCommandDictionary.ContainsKey(parts[1]))
             {
+                timedCommandDictionary[parts[1]].DisableTimedCommand();
                 timedCommandDictionary.Remove(parts[1]);
                 timedCommandDictionary.SaveTimedMessages(channelName, "TimedCommands");
                 Chat($"{parts[1]} isimli döngü mesaj silindi.");
@@ -289,7 +313,7 @@ namespace TwitchBot.Granzwelt
 
             if (timedCommandDictionary.Count > 0)
             {
-                string feedback = "Döngü Komutları --> ";
+                string feedback = "Döngü Mesajlar --> ";
                 int index = 0;
                 foreach (string s in timedCommandDictionary.Keys)
                 {
@@ -299,12 +323,12 @@ namespace TwitchBot.Granzwelt
                 }
                 Chat(feedback);
             }
-            else 
+            else
             {
                 Chat("Oluşturulmuş döngü mesaj bulunamadı.");
             }
 
-            
+
         }
 
         private void CommandKomutEkle(OnMessageReceivedArgs e, string[] parts)

@@ -1,6 +1,6 @@
 using System;
 
-namespace TwitchBot.Granzwelt
+namespace Granzwelt.TwitchBot
 {
     public static class GetInfo
     {

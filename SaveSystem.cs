@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 
-namespace TwitchBot.Granzwelt
+namespace Granzwelt.TwitchBot
 {
     public static class SaveSystem
     {
